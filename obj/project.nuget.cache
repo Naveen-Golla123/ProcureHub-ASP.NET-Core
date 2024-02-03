@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "i60bD4iw8WGXMpgkSieqMQD5sC/a13EHbZJs/bpv6aemXh3FgV0yfpcH78+rrpZGRakYky0uOvbLj8Tqqci16g==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\naveeng\\Documents\\Final Project\\ASP.Net\\ProcureHub-ASP.NET-Core\\ProcureHub-ASP.NET-Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\naveeng\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
+    "C:\\Users\\naveeng\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\naveeng\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.19.5\\microsoft.visualstudio.azure.containers.tools.targets.1.19.5.nupkg.sha512",
+    "C:\\Users\\naveeng\\.nuget\\packages\\swashbuckle.aspnetcore\\6.4.0\\swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
+    "C:\\Users\\naveeng\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.4.0\\swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
+    "C:\\Users\\naveeng\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.4.0\\swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",
+    "C:\\Users\\naveeng\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.4.0\\swashbuckle.aspnetcore.swaggerui.6.4.0.nupkg.sha512"
+  ],
+  "logs": []
+}
