@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProcureHub-ASP.NET-Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e4d2c37befd3650072c37f1b8d7bd287bc8ce833")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6c698732bab28629f2f89ae73c52a4e6401b31fb")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProcureHub-ASP.NET-Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProcureHub-ASP.NET-Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

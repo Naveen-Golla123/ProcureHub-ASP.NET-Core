@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\ProcureHub-ASP.NET-Core.props" />
+</Project>
