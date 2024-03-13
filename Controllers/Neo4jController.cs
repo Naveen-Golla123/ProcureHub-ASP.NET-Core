@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Neo4j.Driver;
+using ProcureHub_ASP.NET_Core.Filters;
 using ProcureHub_ASP.NET_Core.Services.Interfaces;
 using System.Text;
 
@@ -8,6 +9,7 @@ namespace ProcureHub_ASP.NET_Core.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ExtractInfoFilter]
     public class Neo4jController : ControllerBase
     {
         private readonly IDriver _driver;

@@ -13,5 +13,7 @@
         public void SetIsAdmin(bool isAdmin);
 
         public object GetUserContext();
+        public string GetEmail();
+        public void ExtractInfo(string token);
     }
 }

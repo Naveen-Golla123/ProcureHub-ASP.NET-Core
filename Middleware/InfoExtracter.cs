@@ -13,21 +13,11 @@ namespace ProcureHub_ASP.NET_Core.Middleware
             _next = next;
             userContext = _userContext;
         }
-        
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task Invoke(HttpContext context, RequestDelegate next)
         {
-            string authHeader = context.Request.Headers.Authorization;
-            authHeader = authHeader.Replace("Bearer ", string.Empty);
-            if (authHeader != null)
-            {
-                var handler = new JwtSecurityTokenHandler();
-                JwtSecurityToken token = handler.ReadJwtToken(authHeader);
-                if (token != null)
-                {
-                    userContext.SetEmail(token.Claims.First(c => c.Type == "email").Value);
-                }
-            }
+
+            
             await _next(context);
         }
     }

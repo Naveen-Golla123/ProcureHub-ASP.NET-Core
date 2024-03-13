@@ -8,6 +8,8 @@ using ProcureHub_ASP.NET_Core.Services.Interfaces;
 using ProcureHub_ASP.NET_Core.Respositories.Interfaces;
 using ProcureHub_ASP.NET_Core.Middleware;
 using ProcureHub_ASP.NET_Core.Helper;
+using Microsoft.AspNetCore.HttpsPolicy;
+using ProcureHub_ASP.NET_Core.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
@@ -62,12 +65,17 @@ builder.Services.AddSwaggerGen(option =>
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddSingleton<IConnectionDriver, Neo4jDriver>();
-builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
-builder.Services.AddSingleton<IAuthenticationRepository, AuthenticationRepository>();
-builder.Services.AddSingleton<ISupplierService, SupplierService>();
-builder.Services.AddSingleton<ISupplierRepository, SupplierRepository>();
-builder.Services.AddSingleton<IEventService,EventService>();
-builder.Services.AddSingleton<IEventRepository, EventRepository>();
+builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
+builder.Services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
+builder.Services.AddTransient<ISupplierService, SupplierService>();
+builder.Services.AddTransient<ISupplierRepository, SupplierRepository>();
+builder.Services.AddTransient<IEventService,EventService>();
+builder.Services.AddTransient<IEventRepository, EventRepository>();
+builder.Services.AddTransient<ILotsRepository, LotsRepository>();
+builder.Services.AddTransient<ILotsService, LotsService>();
+builder.Services.AddScoped<IUserContext, UserContext>();
+builder.Services.AddTransient<ExtractInfoFilter>();
+
 //builder.Services.Add
 //builder.Services.AddScoped<InfoExtracter>();
 
@@ -99,9 +107,9 @@ app.UseCors(builder =>
     builder.WithOrigins("*")
     .AllowAnyMethod()
     .AllowAnyHeader());
-
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+

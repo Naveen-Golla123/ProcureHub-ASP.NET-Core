@@ -2,10 +2,10 @@
 {
     public class Item
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public float baseprice { get; set; }
-        public int quatity { get; set; }
+        public int _id { get; set; }
+        public string name { get; set; } = string.Empty;
+        public string description { get; set; } = string.Empty;
+        public float basePrice { get; set; }
+        public int quantity { get; set; }
     }
 }

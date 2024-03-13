@@ -16,5 +16,10 @@ namespace ProcureHub_ASP.NET_Core.Services
         {
             return supplierRepository.GetSuppliers();
         }
+
+        public async Task<List<User>> GetAddedSuppliers(int eventId)
+        {
+            return await supplierRepository.GetAddedSuppliers(eventId);
+        }
     }
 }
