@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Mvc;
 using ProcureHub_ASP.NET_Core.Enums;
 using ProcureHub_ASP.NET_Core.Helper;
 using ProcureHub_ASP.NET_Core.Models;
@@ -18,15 +19,15 @@ namespace ProcureHub_ASP.NET_Core.Services
         private readonly ISupplierService _supplierService;
         public EventService(IEventRepository _eventRepository, 
             IUserContext context_, 
-            IServiceProvider serviceProvider, 
             ILotsService lotService,
-            ISupplierService supplierService) 
+            ISupplierService supplierService,
+            IServiceProvider serviceProvider) 
         { 
             eventRepository = _eventRepository;
             context = context_;
-            _serviceProvider = serviceProvider;
             _lotService = lotService;
             _supplierService = supplierService;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task<Event> CreateEvent(Event _event)
@@ -62,9 +63,10 @@ namespace ProcureHub_ASP.NET_Core.Services
                 errors = new List<string>(),
                 isSubmitted = true,
             };
+
             try
             {
-                //Event event_ = await eventRepository.GetEventInfo(eventId);
+               var service = _serviceProvider.GetService<ILiveService>();
                 Event event_ = await eventRepository.GetEventById(eventId);
                 event_.lots = await _lotService.GetAllLots(eventId);
                 event_.suppliers = await _supplierService.GetAddedSuppliers(eventId);
@@ -105,6 +107,17 @@ namespace ProcureHub_ASP.NET_Core.Services
                 else
                 {
                     var response = await ChangeAuctionStatus(eventId,EventStatus.Invited);
+                    string oneMinuteEarlier = GetOneMiniuteEarlyTime(event_.Starttime);
+                    var selectedStartDate = DateTimeOffset.Parse(event_.Startdate + " " + event_.Starttime + ":00 -7:00");
+                    var earlyStartTimeTime = DateTimeOffset.Parse(event_.Startdate + " " + oneMinuteEarlier + ":00 -7:00");
+
+                    // Jobs to Start the Auction
+                    BackgroundJob.Schedule(() => this.eventRepository.ChangeAuctionStatus(event_.id, EventStatus.Live), selectedStartDate);
+                    BackgroundJob.Schedule(() => service.LoadData(eventId), earlyStartTimeTime);
+
+                    // Jobs to End the Auction
+                    var selectedEndDate = DateTimeOffset.Parse(event_.Enddate + " " + event_.Endtime + ":00 -7:00");
+                    BackgroundJob.Schedule(() => this.eventRepository.ChangeAuctionStatus(event_.id, EventStatus.Completed), selectedEndDate);
                     submitAuction.isSubmitted = true;
                 }
                 
@@ -126,9 +139,53 @@ namespace ProcureHub_ASP.NET_Core.Services
             }
         }
 
+        private string GetOneMiniuteEarlyTime(string time)
+        {
+            int hours = Int32.Parse(time.Substring(0, 2));
+            int mins = Int32.Parse(time.Substring(3));
+
+            if (mins == 0)
+            {
+                hours = hours - 1;
+                mins = 59;
+            }
+            else
+            {
+                mins = mins - 1;
+            }
+            string updatedTime = hours.ToString() + ":" + (mins < 10 ? "0" : "") + mins.ToString();
+            return updatedTime;
+        }
+
         public async Task<bool> ChangeAuctionStatus(int eventId, EventStatus eventStatus)
         {
             return await eventRepository.ChangeAuctionStatus(eventId,eventStatus);
+        }
+
+        public async Task<List<SupplierEvent>> GetInvitedEvents()
+        {
+            return await eventRepository.GetInvitedEvents();
+        }
+
+        public async Task<bool> TestHangfire()
+        {
+            // test hang fire here.
+            var backgroudClient = new BackgroundJobClient();
+
+            var selecteDate = DateTimeOffset.Parse("2024-03-22 09:08:00");
+            BackgroundJob.Schedule(() => this.eventRepository.ChangeAuctionStatus(127, EventStatus.Completed), selecteDate);
+            //await this.eventRepository.ChangeAuctionStatus(127, EventStatus.Completed);
+            return true;
+        }
+
+        public async Task<int> AcceptEvent(int eventId)
+        {
+            return await this.eventRepository.AcceptEvent(eventId);
+        }
+
+        public async Task<int> RejectEvent(int eventId)
+        {
+            return await this.eventRepository.RejectEvent(eventId);
         }
     }
 }

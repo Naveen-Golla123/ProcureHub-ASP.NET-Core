@@ -20,8 +20,17 @@ namespace ProcureHub_ASP.NET_Core.Services
 
         public async Task<List<Lot>> GetAllLots(int eventId)
         {
-
-            return await _lotsRepository.GetAllLots(eventId);
+            List <Lot> lots = await _lotsRepository.GetAllLots(eventId);
+            foreach(Lot lot in lots) 
+            {   
+                float totalPrice = 0;
+                foreach(Item item in lot.has_item)
+                {
+                    totalPrice += item.basePrice * item.quantity;
+                }
+                lot.TotalPrice = totalPrice;
+            }
+            return lots;
         }
 
         public Task<Lot> GetLotById(string id)

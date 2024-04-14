@@ -110,38 +110,22 @@ namespace ProcureHub_ASP.NET_Core.Respositories
             try
             {
                 List<Lot> lots = new List<Lot>();
-                string query = "MATCH path = (e)-[*]->(lot) where ID(e) = $eventId WITH collect(path) as paths CALL apoc.convert.toTree(paths) yield value RETURN value.has_lot as result;";
+                string query = "MATCH (e:Event)-[:HAS_LOT]->(l:Lot) WHERE ID(e)=$eventId WITH COLLECT(l) as lots UNWIND lots as lot MATCH (lot)-[:HAS_ITEM]->(i:Item) return {name:lot.name, description:lot.description, _id:ID(lot)} as lot, collect({_id:ID(i),quantity:i.quantity, name:i.name,basePrice:i.basePrice}) as Items";
                 var reader = await session.RunAsync(query, new
                 {
                     eventId = eventId_
                 });
-
-                var list = await reader.ToListAsync();
                 
-                //while(await reader.FetchAsync())
-                //{
-                //    IDictionary<string, Object> node = reader.Current["value"].As<IDictionary<string,Object>>();
-                //    Console.WriteLine(node);
-                //    if(node != null)
-                //    {
-                //        var lots_ = node["has_lot"];
-
-                //        foreach(var lot in (IEnumerable)lots_)
-                //        {
-                //            Lot lot_ = new Lot();
-                //            //lot_.Name = lot.Name;
-                //            //lot_.Description = lot.Description;
-                //            lots.Append(lot_);
-                //        }
-                //    }
-                //}
-
-                foreach(var lot in list)
+                while(await reader.FetchAsync())
                 {
+                    var node = reader.Current["lot"];
+                    var temp = JsonSerializer.Serialize(node);
+                    Lot lot = JsonSerializer.Deserialize<Lot>(temp);
 
-                    var temp = JsonSerializer.Serialize(lot.Values["result"]);
-                    lots = JsonSerializer.Deserialize<List<Lot>>(temp);
-
+                    node = reader.Current["Items"];
+                    temp = JsonSerializer.Serialize(node);
+                    lot.has_item = JsonSerializer.Deserialize<List<Item>>(temp);
+                    lots.Add(lot);
                 }
 
                 return lots;

@@ -8,6 +8,7 @@
         public bool isBuyer { get; set; }
         public bool isAdmin { get; set; }
         public bool? isApproved { get; set; }
+        public bool? isSupplier { get; set; }
         public string mobile { get; set; }
     }
 }

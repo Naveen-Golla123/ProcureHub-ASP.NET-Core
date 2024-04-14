@@ -33,7 +33,7 @@ namespace ProcureHub_ASP.NET_Core.Respositories
             var session = connection.AsyncSession();
             try
             {
-                string query = "MATCH (event:Event) WHERE ID(event) = $id SET event.description = $description, event.statusCode = $statusCode, event.startTime = $startTime, event.endTime= $endTime, event.startDate = $startDate, event.endDate = $endDate return {id: ID(event), name: event.name, description: event.description, statusCode:event.statusCode, Startdate: event.startDate , Starttime: event.startTime , Enddate: event.endDate , Endtime: event.endTime  } as event";
+                string query = "MATCH (event:Event) WHERE ID(event) = $id SET event.name = $eventName, event.description = $description, event.statusCode = $statusCode, event.startTime = $startTime, event.endTime= $endTime, event.startDate = $startDate, event.endDate = $endDate return {id: ID(event), name: event.name, description: event.description, statusCode:event.statusCode, Startdate: event.startDate , Starttime: event.startTime , Enddate: event.endDate , Endtime: event.endTime  } as event";
                 var statementParameters = new Dictionary<string, object>
                 {
                     {"id", _event.id }, { "eventName" , _event.name }, {"description", _event.description}, {"statusCode", (int) EventStatus.Draft}, {"startDate" , _event.Startdate}, { "endDate" , _event.Enddate}, { "endTime" , _event.Endtime}, {"startTime", _event.Starttime}
@@ -61,13 +61,15 @@ namespace ProcureHub_ASP.NET_Core.Respositories
         public async Task<Event> CreateEvent(Event _event)
         {
             IDriver connection = driver.GetConnection();
+            var userContext = _serviceProvider.GetService<IUserContext>();
+            var email = userContext.GetEmail();
             var session = connection.AsyncSession();
             try
             {
-                string query = "MATCH(creator:user{email:'naveeng@csu.fullerton.edu'}) CREATE(event:Event{name:$eventName, description: $eventDescription, statusCode: $statusCode, startTime : $startTime, endTime: $endTime, startDate : $startDate, endDate : $endDate })-[r:CREATED_BY]->(creator) return creator, r, event";
+                string query = "MATCH(creator:user{email:$email}) CREATE(event:Event{name:$eventName, description: $eventDescription, statusCode: $statusCode, startTime : $startTime, endTime: $endTime, startDate : $startDate, endDate : $endDate })-[r:CREATED_BY]->(creator) return creator, r, event";
                 var statementParameters = new Dictionary<string, object>
                 {
-                    { "eventName" , _event.name }, {"eventDescription", "event description"}, {"statusCode", (int) EventStatus.Draft}, {"startDate" , _event.Startdate}, { "endDate" , _event.Enddate}, { "endTime" , _event.Endtime}, {"startTime", _event.Startdate}
+                    { "eventName" , _event.name }, { "email", email},  {"eventDescription", "event description"}, {"statusCode", (int) EventStatus.Draft}, {"startDate" , _event.Startdate}, { "endDate" , _event.Enddate}, { "endTime" , _event.Endtime}, {"startTime", _event.Starttime}
             };
                 return await session.ExecuteWriteAsync(async tx => 
                 { 
@@ -167,7 +169,7 @@ namespace ProcureHub_ASP.NET_Core.Respositories
             var session = connection.AsyncSession();
             try
             {
-                string query = "UNWIND $supplierList as supplierId MATCH (supplier:user) where ID(supplier) = supplierId match (event:Event)  where  Id(event) = $eventId with supplier, event merge (supplier)-[r:ADDED_TO]->(event) return supplier, event";
+                string query = "UNWIND $supplierList as supplierId MATCH (supplier:user) where ID(supplier) = supplierId match (event:Event)  where  Id(event) = $eventId with supplier, event merge (supplier)-[r:ADDED_TO{ isInvited:true, isAccepted: false, isRejected: false }]->(event) return supplier, event";
                 return await session.ExecuteWriteAsync(async tx =>
                 {
                     var reader = await tx.RunAsync(query, new
@@ -225,6 +227,7 @@ namespace ProcureHub_ASP.NET_Core.Respositories
 
         public async Task<bool> ChangeAuctionStatus(int eventId, EventStatus eventStatus)
         {
+            Console.WriteLine("Background Job triggered !!" + DateTime.Now.ToString());
             IDriver connection = driver.GetConnection();
             var session = connection.AsyncSession();
             try
@@ -240,7 +243,119 @@ namespace ProcureHub_ASP.NET_Core.Respositories
                     var result = await reader.FetchAsync();
                     return result;
                 });
+            }
+            catch
+            {
+                throw;
+            }
+        }
 
+        public async Task<List<SupplierEvent>> GetInvitedEvents()
+        {
+            try
+            {
+                var userContext = _serviceProvider.GetService<IUserContext>();
+                var email = userContext.GetEmail();
+                var connection = driver.GetConnection();
+                var session = connection.AsyncSession();
+                string query = "MATCH (supplier:user{email:$email})-[r:ADDED_TO]->(event:Event)-[c:CREATED_BY]->(creator:user) return supplier, r, event, creator";
+                var reader = await session.RunAsync(query, new {
+                    email = email
+                });
+
+                List<SupplierEvent> supplierEvents = new List<SupplierEvent>();
+
+                while(await reader.FetchAsync())
+                {
+                    var relationNode = reader.Current["r"].As<IRelationship>();
+                    var eventNode = reader.Current["event"].As<INode>();
+                    var creatorNode = reader.Current["creator"].As<INode>();
+
+                    SupplierEvent event_ = new SupplierEvent();
+                    
+                    event_.EventId = (int)eventNode.Id;
+                    event_.Name = eventNode.Properties["name"].As<string>();
+                    event_.Description = eventNode.Properties["description"].As<string>();
+                    event_.StatusCode = (EventStatus)eventNode.Properties["statusCode"].As<int>();
+
+                    event_.CreatedBy.name = creatorNode.Properties["name"].As<string>();
+                    event_.CreatedBy.email = creatorNode.Properties["email"].As<string>();
+                    
+                    event_.isAdded = true;
+                    event_.isInvited = relationNode.Properties["isInvited"].As<bool>();
+                    event_.isAccepted = relationNode.Properties["isAccepted"].As<bool>();
+                    event_.isRejected = relationNode.Properties["isRejected"].As<bool>();
+
+                    supplierEvents.Add(event_);
+                }
+                return supplierEvents;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> AcceptEvent(int eventId)
+        {
+
+            try
+            {
+                var userContext = _serviceProvider.GetService<IUserContext>();
+                var email = userContext.GetEmail();
+                var connection = driver.GetConnection();
+                var session = connection.AsyncSession();
+                string query = "MATCH (u:user{email:$email})-[r:ADDED_TO]->(event:Event) where ID(event)=$eventId SET r.isAccepted = true return event";
+                return await session.ExecuteWriteAsync(async tx =>
+                {
+                    var reader = await tx.RunAsync(query, new
+                    {
+                        email = email,
+                        eventId = eventId
+                    });
+
+                    int eventId_ = 0;
+                    while(await reader.FetchAsync())
+                    {
+                        var node = reader.Current["event"].As<INode>();
+                        eventId_ = (int)node.Id;
+                    }
+
+                    return eventId_;
+                });
+            }
+            catch 
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> RejectEvent(int eventId)
+        {
+            try
+            {
+                var userContext = _serviceProvider.GetService<IUserContext>();
+                var email = userContext.GetEmail();
+                var connection = driver.GetConnection();
+                var session = connection.AsyncSession();
+                string query = "MATCH (u:user{email:$email})-[r:ADDED_TO]->(event:Event) where ID(event)=$eventId SET r.isRejected = true return event";
+                return await session.ExecuteWriteAsync(async tx =>
+                {
+                    var reader = await tx.RunAsync(query, new
+                    {
+                        email = email,
+                        eventId = eventId
+                    });
+
+                    int eventId_ = 0;
+                    while (await reader.FetchAsync())
+                    {
+                        var node = reader.Current["event"].As<INode>();
+                        eventId_ = (int)node.Id;
+                    }
+
+                    return eventId_;
+                });
             }
             catch
             {

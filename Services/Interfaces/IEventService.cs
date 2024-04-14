@@ -13,5 +13,9 @@ namespace ProcureHub_ASP.NET_Core.Services.Interfaces
         public Task<bool> AddSuppliers(List<int> supplierIds, int eventId);
         public Task<SubmitAuctionResponse> SubmitAuction(int eventId);
         public Task<bool> ChangeAuctionStatus(int eventId, EventStatus eventStatus);
+        public Task<List<SupplierEvent>> GetInvitedEvents();
+        public Task<bool> TestHangfire();
+        public Task<int> AcceptEvent(int eventId);
+        public Task<int> RejectEvent(int eventId);
     }
 }

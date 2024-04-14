@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProcureHub_ASP.NET_Core.Filters;
 using ProcureHub_ASP.NET_Core.Models;
@@ -8,6 +9,7 @@ namespace ProcureHub_ASP.NET_Core.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] 
     [ExtractInfoFilter]
     public class LotsController : ControllerBase
     {

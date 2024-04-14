@@ -9,5 +9,6 @@ namespace ProcureHub_ASP.NET_Core.Models
         public string description { get; set; } = string.Empty;
         public List<Item> has_item { get; set; }
         public int? EventId { get; set; }
+        public float TotalPrice { get; set; } = 0;
     }
 }

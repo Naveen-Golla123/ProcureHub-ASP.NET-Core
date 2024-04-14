@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using ProcureHub_ASP.NET_Core.Helper;
 
 namespace ProcureHub_ASP.NET_Core.Controllers
 {
@@ -14,6 +16,8 @@ namespace ProcureHub_ASP.NET_Core.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IDistributedCache distributedCache;
+        private readonly IRedisConnection _redisConnection;
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {

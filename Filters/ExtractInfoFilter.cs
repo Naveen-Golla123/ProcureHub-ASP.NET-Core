@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.SignalR;
 using ProcureHub_ASP.NET_Core.Helper;
 using ProcureHub_ASP.NET_Core.Models;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace ProcureHub_ASP.NET_Core.Filters
 {
-    public class ExtractInfoFilter : Attribute ,IActionFilter
+    
+    public class ExtractInfoFilter : Attribute ,IActionFilter, IHubFilter
     {
         private IUserContext _userContext;
         public ExtractInfoFilter() 
@@ -32,6 +34,7 @@ namespace ProcureHub_ASP.NET_Core.Filters
                 if (token != null)
                 {
                     service.SetEmail(token.Claims.First(c => c.Type == "email").Value);
+                    service.SetUserId(Int32.Parse(token.Claims.First(c => c.Type == "userId").Value));
                 }
             }
         }

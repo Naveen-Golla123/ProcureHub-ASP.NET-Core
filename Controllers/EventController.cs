@@ -29,7 +29,6 @@ namespace ProcureHub_ASP.NET_Core.Controllers
             
         }
 
-
         [HttpPost("UpdateEvent")]
         public async Task<IActionResult> UpdateEvent([FromBody] Event _event)
         {
@@ -59,6 +58,30 @@ namespace ProcureHub_ASP.NET_Core.Controllers
         public async Task<IActionResult> SubmitAuction(int eventId)
         {
             return Ok(await eventService.SubmitAuction(eventId));
+        }
+
+        [HttpGet("GetInvitedSuppliers")]
+        public async Task<IActionResult> GetInvitedEvents()
+        {
+            return Ok(await eventService.GetInvitedEvents());
+        }
+
+        [HttpGet("")]
+        public async Task<IActionResult> TestHangfire()
+        {
+            return Ok(await eventService.TestHangfire());
+        }
+
+        [HttpPost("AcceptEvent/{eventId}")]
+        public async Task<IActionResult> AcceptEvent(int eventId)
+        {
+            return Ok(await eventService.AcceptEvent(eventId));
+        }
+
+        [HttpPost("RejectEvent/{eventId}")]
+        public async Task<IActionResult> RejectEvent(int eventId)
+        {
+            return Ok(await eventService.RejectEvent(eventId));
         }
     }
 }

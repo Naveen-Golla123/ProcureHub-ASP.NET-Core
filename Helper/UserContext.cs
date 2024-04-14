@@ -11,6 +11,7 @@ namespace ProcureHub_ASP.NET_Core.Helper
         private bool isSupplier = false;
         private string partnerCode;
         private bool isAdmin = false;
+        private int userId = 0;
 
         public UserContext()
         {
@@ -54,6 +55,11 @@ namespace ProcureHub_ASP.NET_Core.Helper
             this.isAdmin = isAdmin;
         }
 
+        public void SetUserId(int userId)
+        {
+            this.userId = userId;
+        }
+
         public object GetUserContext()
         {
             return new
@@ -67,6 +73,16 @@ namespace ProcureHub_ASP.NET_Core.Helper
             return email;
         }
 
+        public bool GetIsSupplier()
+        {
+            return isSupplier;
+        }
+
+        public int GetUserId()
+        {
+            return userId;
+        }
+
         public void ExtractInfo(string jwtToken)
         {
             var authHeader = jwtToken.Replace("Bearer ", string.Empty);
@@ -77,6 +93,8 @@ namespace ProcureHub_ASP.NET_Core.Helper
                 if (token != null)
                 {
                     this.email = token.Claims.First(c => c.Type == "email").Value;
+                    this.isSupplier = token.Claims.First(c => c.Type == "isSupplier").Value == "True" ? true : false;
+                    this.userId = Int32.Parse(token.Claims.First(c => c.Type == "userId").Value);
                 }
             }
         }

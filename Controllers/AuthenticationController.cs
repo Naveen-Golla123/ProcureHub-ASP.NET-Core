@@ -4,6 +4,8 @@ using ProcureHub_ASP.NET_Core.Models;
 using Newtonsoft.Json.Linq;
 using ProcureHub_ASP.NET_Core.Services;
 using Microsoft.AspNetCore.Authorization;
+using ProcureHub_ASP.NET_Core.Helper;
+using ProcureHub_ASP.NET_Core.Services.Interfaces;
 
 namespace ProcureHub_ASP.NET_Core.Controllers
 {
@@ -13,10 +15,12 @@ namespace ProcureHub_ASP.NET_Core.Controllers
     public class AuthenticationController: ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
+        private readonly ILiveService liveService;
 
-        public AuthenticationController(IAuthenticationService authService) 
+        public AuthenticationController(IAuthenticationService authService, ILiveService _liveservice) 
         {
             _authenticationService = authService;
+            liveService = _liveservice;
         }
 
         [HttpPost(Name = "SignUp")]
@@ -41,6 +45,7 @@ namespace ProcureHub_ASP.NET_Core.Controllers
         [HttpPost(Name ="Login")]
         public async Task<IActionResult> Login(UserDTO user)
         {
+              
             return Ok(await _authenticationService.SignIn(user.email, user.password));
         }
 
@@ -53,6 +58,7 @@ namespace ProcureHub_ASP.NET_Core.Controllers
         [HttpPost(Name = "CheckEmailAvailability")]
         public async Task<bool> IsEmailAvailable(CheckEmailAvailability checkEmailAvailable)
         {
+            liveService.LoadData(128);
             return await _authenticationService.IsEmailAvailable(checkEmailAvailable.Email);
         }
 

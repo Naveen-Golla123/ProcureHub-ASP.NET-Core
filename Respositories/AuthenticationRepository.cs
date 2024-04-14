@@ -89,9 +89,11 @@ namespace ProcureHub_ASP.NET_Core.Respositories
                     userDetails.mobile = node.Properties["mobile"].As<string>();
                     userDetails.hashedPassword = node.Properties["password"].As<byte[]>();
                     userDetails.hashSalt = node.Properties["hashSalt"].As<byte[]>();
+                    userDetails.isSupplier = node.Properties["isSupplier"].As<bool>();
                     userDetails.isApproved = node.Properties["isApproved"].As<bool>();
                     userDetails.isAdmin = node.Properties["isAdmin"].As<bool>();
                     userDetails.name = node.Properties["name"].As<string>();
+                    userDetails.id = (int)node.Id;
                 }
                 return userDetails;
             }
