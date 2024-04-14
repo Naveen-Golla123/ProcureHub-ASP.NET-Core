@@ -39,21 +39,7 @@ builder.Services.AddHangfire((sp, config) =>
     config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
             .UseSimpleAssemblyNameTypeSerializer()
             .UseRecommendedSerializerSettings()
-            .UseStorage(
-                new MySqlStorage(
-                    "server=localhost;database=procurehub;uid=root;pwd=Golla@189;Allow User Variables=True",
-                    new MySqlStorageOptions
-                    {
-                        QueuePollInterval = TimeSpan.FromSeconds(10),
-                        JobExpirationCheckInterval = TimeSpan.FromHours(1),
-                        CountersAggregateInterval = TimeSpan.FromMinutes(5),
-                        PrepareSchemaIfNecessary = true,
-                        DashboardJobListLimit = 25000,
-                        TransactionTimeout = TimeSpan.FromMinutes(1),
-                        TablesPrefix = "Hangfire",
-                    }
-                )
-            );
+            .UseSqlServerStorage("server=sql3.freesqldatabase.com;database=sql3699001;password=3aDDKMn6KY;user=sql3699001");
     //config.UseSqlServerStorage(@"Data Source=127.0.0.1:3306;Initial Catalog=procurehub;User Id=root;Password=Golla@189; Integrated Security=SSPI;Trusted_Connection=True;TrustServerCertificate=True;");
 });
 
