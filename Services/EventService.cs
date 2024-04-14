@@ -112,13 +112,13 @@ namespace ProcureHub_ASP.NET_Core.Services
                     var earlyStartTimeTime = DateTimeOffset.Parse(event_.Startdate + " " + oneMinuteEarlier + ":00 -7:00");
 
                     // Jobs to Start the Auction
-                    BackgroundJob.Schedule(() => this.eventRepository.ChangeAuctionStatus(event_.id, EventStatus.Live), selectedStartDate);
-                    BackgroundJob.Schedule(() => service.LoadData(eventId), earlyStartTimeTime);
+                    //BackgroundJob.Schedule(() => this.eventRepository.ChangeAuctionStatus(event_.id, EventStatus.Live), selectedStartDate);
+                    //BackgroundJob.Schedule(() => service.LoadData(eventId), earlyStartTimeTime);
 
-                    // Jobs to End the Auction
-                    var selectedEndDate = DateTimeOffset.Parse(event_.Enddate + " " + event_.Endtime + ":00 -7:00");
-                    BackgroundJob.Schedule(() => this.eventRepository.ChangeAuctionStatus(event_.id, EventStatus.Completed), selectedEndDate);
-                    submitAuction.isSubmitted = true;
+                    //// Jobs to End the Auction
+                    //var selectedEndDate = DateTimeOffset.Parse(event_.Enddate + " " + event_.Endtime + ":00 -7:00");
+                    //BackgroundJob.Schedule(() => this.eventRepository.ChangeAuctionStatus(event_.id, EventStatus.Completed), selectedEndDate);
+                    //submitAuction.isSubmitted = true;
                 }
                 
             }

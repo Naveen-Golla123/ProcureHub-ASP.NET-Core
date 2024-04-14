@@ -34,16 +34,16 @@ builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddHangfire((sp, config) =>
-{
-    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-            .UseSimpleAssemblyNameTypeSerializer()
-            .UseRecommendedSerializerSettings()
-            .UseSqlServerStorage("server=sql3.freesqldatabase.com;database=sql3699001;password=3aDDKMn6KY;user=sql3699001");
-    //config.UseSqlServerStorage(@"Data Source=127.0.0.1:3306;Initial Catalog=procurehub;User Id=root;Password=Golla@189; Integrated Security=SSPI;Trusted_Connection=True;TrustServerCertificate=True;");
-});
+//builder.Services.AddHangfire((sp, config) =>
+//{
+//    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+//            .UseSimpleAssemblyNameTypeSerializer()
+//            .UseRecommendedSerializerSettings()
+//            .UseSqlServerStorage("server=sql3.freesqldatabase.com;database=sql3699001;password=3aDDKMn6KY;user=sql3699001");
+//    //config.UseSqlServerStorage(@"Data Source=127.0.0.1:3306;Initial Catalog=procurehub;User Id=root;Password=Golla@189; Integrated Security=SSPI;Trusted_Connection=True;TrustServerCertificate=True;");
+//});
 
-builder.Services.AddHangfireServer();
+//builder.Services.AddHangfireServer();
 
 
 builder.Services.AddSwaggerGen(option =>
@@ -128,7 +128,7 @@ if (app.Environment.IsDevelopment())
 
 
 
-app.UseHangfireDashboard("/hangfire");
+//app.UseHangfireDashboard("/hangfire");
 app.UseCors(builder =>
     builder.WithOrigins("*")
     .AllowAnyMethod()
